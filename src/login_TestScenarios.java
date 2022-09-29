@@ -54,6 +54,7 @@ public class login_TestScenarios {
 	public void login_happyPath() throws Exception {
 	
 		MyScreenRecorder screenrecording = new MyScreenRecorder("navigationTest", new File("./recording/"));
+		screenrecording.start();
 		driver.get("https://demo.guru99.com/v4/");
 		driver.manage().window().maximize();
 		Thread.sleep(3000);
