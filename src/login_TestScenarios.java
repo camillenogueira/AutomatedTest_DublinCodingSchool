@@ -1,115 +1,129 @@
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.time.Duration;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
-import org.junit.jupiter.api.Order;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Cookie;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 
 @TestMethodOrder(OrderAnnotation.class)
-@DisplayName("Testing login functionality of Guru99")
-public class login_TestScenarios {
-
+@DisplayName("Test Scenario to test login functionality")
+public class login_TestScenarios { 
 	
+	
+	//Declaration of the object webdriver
 	public static WebDriver driver = null;
 	
+	
 	@BeforeAll
-	public static void beforeall() throws InterruptedException {
-		
+	public static void beforeAll() {
 		WebDriverManager.chromedriver().setup();
 		
-		//System.setProperty("webdriver.chrome.driver", "/Users/camillenogueira/webdriver/chromedriver");
 		driver = new ChromeDriver();
-		//driver.manage().timeouts().wait(3000); //.implicitlyWait(6, null);
+	
 	}
 	
 	@AfterAll
-	public static void afterall() {
+	public static void afterAll() {
 		driver.close();
-	}
-	
-	@Test
-	@Order(1)
-	@DisplayName("Login Happy Path")
-	public void login_happyPath() throws Exception {
-	
-		MyScreenRecorder screenrecording = new MyScreenRecorder("navigationTest", new File("./recording/"));
-		screenrecording.start();
-		driver.get("https://demo.guru99.com/v4/");
-		driver.manage().window().maximize();
-		Thread.sleep(3000);
-		
-		driver.switchTo().frame("gdpr-consent-notice").findElement(By.id("save")).click();
-	
-		//Thread.sleep(1000);
-		driver.findElement(By.name("uid")).sendKeys("mngr440377"); //username
-		driver.findElement(By.name("password")).sendKeys("EtEsene"); //password
-		driver.findElement(By.cssSelector("body > form > table > tbody > tr:nth-child(3) > td:nth-child(2) > input[type=submit]:nth-child(1)")).click(); //click on the button to login
-		
-		//Thread.sleep(1000);
-		
-		//JavascriptExecutor js = (JavascriptExecutor)driver;
-		//js.executeScript("arguments[0].click();", driver.findElement(By.id("dismiss-button")));
-		
-		/*String actualResults = driver.getCurrentUrl();
-		String expectedResults = "https://demo.guru99.com/v4/manager/Managerhomepage.php";
-		
-		assertEquals(actualResults,expectedResults);
-		assertTrue(actualResults.contains(expectedResults));
-		//assertThat(actualResults, is(expectedResults));
-		*/
-		screenrecording.stop();
-		
 		//driver.quit();
 	}
 	
+	//@BeforeEach
+	//@AfterEach
+	
+	@Test
+	@Order(1)
+	@DisplayName("Check results on entering a valid userID and password")
+	public void login_happyPath() throws InterruptedException {
+		
+		//Data to be used in this test
+		String userID = "mngr444684";
+		String password = "ypadYdu";
+		
+		//Open the URL demo.guru99.com/v4
+		driver.get("https://demo.guru99.com/v4");
+		driver.manage().window().maximize();
+		Thread.sleep(5000); //wait for 5 seconds to execute the next line of code
+		
+		driver.switchTo().frame("gdpr-consent-notice").findElement(By.id("save")).click();
+		
+		Thread.sleep(3000);
+		//Enter the UserID
+		driver.findElement(By.name("uid")).sendKeys(userID);
+		
+		//Enter the password
+		driver.findElement(By.name("password")).sendKeys(password);
+		
+		//Click on the button to submit
+		driver.findElement(By.name("btnLogin")).click();
+		
+		//Check if the welcome message is displayed
+		String actualResults = driver.findElement(By.cssSelector("body > table > tbody > tr > td > table > tbody > tr:nth-child(2) > td > marquee")).getText();
+		String expectedResults = "Welcome To Manager's Page of Guru99 Bank";
+		
+		assertEquals(expectedResults, actualResults);
+		//assertTrue(actualResults.contains(expectedResults));
+	
+	}
 	
 	@Test
 	@Order(2)
-	public void login_unhappyPath_wrongUsername() {
+	@DisplayName("Check results on entering invalid userID")
+	public void invalidUserID_Login() throws InterruptedException {
+		
+		//Data to be used in this test
+		String userID = "mngr444684";
+		String password = "ypadYd";
+		
+		//Open the URL
+		driver.get("https://demo.guru99.com/v4");
+		driver.manage().window().maximize();
+		Thread.sleep(5000); //wait for 5 seconds to execute the next line of code
+		
+		if (driver.findElement(By.tagName("iframe")).isDisplayed()) {
+			driver.findElement(By.className("fc-button-label")).click();
+
+		}
+		
+		//Enter the user ID
+		driver.findElement(By.name("uid")).sendKeys(userID);
+		
+		//Enter the password
+		driver.findElement(By.name("password")).sendKeys(password);
+		
+		//Click on submit
+		driver.findElement(By.name("btnLogin")).click();
+		
+		//check the message on the alert: User or Password is not valid
+		String actualResults = driver.switchTo().alert().getText();
+		String expectedResults = "User or Password is not valid"; 
+		
+		assertEquals(expectedResults,actualResults);
 		
 		
-		
-		/*
-		 * 
-		 * here is the test
-		 */
-		
+		//Click on OK in the alert
+		driver.switchTo().alert().accept();
 		
 	}
 	
 	@Test
 	@Order(3)
-	public void login_unhappyPath_blankField() {
-		
-		
-		/*
-		 * 
-		 * here is the test
-		 */
+	public void allFieldsBlank_login() {
 		
 		
 	}
 	
 	
 }
+
+
