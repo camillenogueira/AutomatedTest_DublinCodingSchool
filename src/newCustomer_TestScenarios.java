@@ -1,94 +1,115 @@
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-public class newCustomer_TestScenarios {
+import io.github.bonigarcia.wdm.WebDriverManager;
 
+
+@TestMethodOrder(OrderAnnotation.class)
+@DisplayName("Test Scenario to test new customer functionality")
+public class newCustomer_TestScenarios {
+	
+	//Declaration of the object webdriver
 	public static WebDriver driver = null;
 	
+	
 	@BeforeAll
-	public static void beforeall() {
-		System.setProperty("webdriver.chrome.driver", "/Users/camillenogueira/webdriver/chromedriver");
+	public static void beforeAll() {
+		WebDriverManager.chromedriver().setup();
+		
 		driver = new ChromeDriver();
+	
 	}
 	
 	@AfterAll
-	public static void afterall() {
-		driver.close();
+	public static void afterAll() {
+		//driver.close();
+		//driver.quit();
 	}
 	
 	@Test
-	public void errorMensageBlankField() {
+	@DisplayName("Check results on entering a valid information for all fields")
+	public void addCustomer_happyPath() throws InterruptedException {
 		
-	}
-	
-	@Test
-	public void addNewCustomer_happyPath() {
+		// =======================================
+		// Pre condition - Login Functionality 
+		// =======================================
 		
-	}
+		//Data to be used in this test
+		String userID = "mngr444684";
+		String password = "ypadYdu";
 		
-	@Test
-	public void checkAllLabels() throws InterruptedException {
-		
-		//Login
-		driver.get("https://demo.guru99.com/v4/");
+		//Open the URL
+		driver.get("https://demo.guru99.com/v4");
 		driver.manage().window().maximize();
+		Thread.sleep(5000); //wait for 5 seconds to execute the next line of code
+		
+		driver.switchTo().frame("gdpr-consent-notice").findElement(By.id("save")).click();
+		
 		Thread.sleep(3000);
-		driver.switchTo().frame("gdpr-consent-notice").findElement(By.id("save")).click(); //close the iframe to accept the data privacy popup
-		Thread.sleep(1000);
-		driver.findElement(By.name("uid")).sendKeys("mngr434560"); //username
-		driver.findElement(By.name("password")).sendKeys("uredepA"); //password
-		driver.findElement(By.cssSelector("body > form > table > tbody > tr:nth-child(3) > td:nth-child(2) > input[type=submit]:nth-child(1)")).click(); //click on the button to login
-		Thread.sleep(1000);
-		//End of Login
+		//Enter the user ID
+		driver.findElement(By.name("uid")).sendKeys(userID);
 		
-		//driver.get("https://demo.guru99.com/v4/manager/addcustomerpage.php");
+		//Enter the password
+		driver.findElement(By.name("password")).sendKeys(password);
 		
-		//Comment the Click on the new customer to not open the iframe
+		//Click on submit
+		driver.findElement(By.name("btnLogin")).click();
+		// =======================================
+		// =======================================
+		
+		String customerName = "Adam";
+		String gender = "Male";
+		String dob = "01/01/1991";
+		String address = "47, Testing Road";
+		String city = "Dublin";
+		String state = "Dublin";
+		String pin = "1234567";
+		String mobileNumber = "1234567";
+		String email = "adam123@guru.ie";
+		String customer_password = "1234567";
+		
+		//Click on New Customer
 		driver.findElement(By.linkText("New Customer")).click();
-		Thread.sleep(1000);
+		//driver.findElement(By.partialLinkText("Customer")).click();
+		driver.get("https://demo.guru99.com/v4/manager/addcustomerpage.php");
 		
-		//Close the iframe
-		//driver.switchTo().frame("google_ads_iframe_/24132379/INTERSTITIAL_DemoGuru99_0").findElement(By.id("dismiss-button")).click(); //close the iframe afte click on the link "New Customer
-
-		WebElement frame1 = driver.findElement(By.id("google_ads_iframe_/24132379/INTERSTITIAL_DemoGuru99_0"));
-
-		driver.switchTo().frame(frame1);
-
-		WebElement frame2 = driver.findElement(By.id("ad_iframe"));
-
-		driver.switchTo().frame(frame2);
-
-		driver.findElement(By.xpath("//div[@id='dismiss-button']/div/span")).click();
-
-		driver.switchTo().defaultContent();
+		//Enter the Customer Name
+		driver.findElement(By.name("name")).sendKeys(customerName);
 		
-		Thread.sleep(1000);
+		//Click on the gender (Male)
+		driver.findElement(By.cssSelector("body > table > tbody > tr > td > table > tbody > tr:nth-child(5) > td:nth-child(2) > input[type=radio]:nth-child(1)")).click();
+		
+		//Enter the DoB
+		driver.findElement(By.id("dob")).sendKeys(dob);
+		
+		//Enter the address
+		driver.findElement(By.xpath("/html/body/table/tbody/tr/td/table/tbody/tr[7]/td[2]/textarea")).sendKeys(address);
+		
+		//Enter the city
 		
 		
-		//driver.findElement(By.xpath("/html/body/div[3]/div/ul/li[2]/a")).click();
-		//driver.findElement(By.cssSelector("body > div:nth-child(6) > div > ul > li:nth-child(2) > a")).click();
-		////a[contains(text(),'New Customer
+		//Enter State
 		
-		//Check if the Subtitle "Add New Customer" is correct
-		String actualResults = driver.findElement(By.cssSelector("body > table > tbody > tr > td > table > tbody > tr:nth-child(1) > td > p")).getText();
-		String expectedResults = "Add New Customer";
-		assertEquals(expectedResults, actualResults);
+		//Enter PIN
 		
-		//Check if the Label "Customer Name" is correct
-		actualResults = driver.findElement(By.xpath("/html/body/table/tbody/tr/td/table/tbody/tr[4]/td[1]")).getText();
-		expectedResults = "Customer Name";
-		assertTrue(actualResults.contains(expectedResults));
+		//Enter Mobile Number
 		
-		//Check if the Label "Gender" is correct
-		assertEquals("Gender", driver.findElement(By.xpath("/html/body/table/tbody/tr/td/table/tbody/tr[5]/td[1]")).getText());
+		//Enter email
+		
+		//Enter Password
+		
+		//Click on Submit 
+		
+		
 		
 	}
+	
+	
 }
